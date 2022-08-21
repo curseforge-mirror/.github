@@ -5,7 +5,7 @@ Feel free to open a ticket if you'd like to see a new addon tracked here or if a
 Current Addon List (8/21)
 ----
 | Name | Last Deploy Status | Template Sync Status |
-| --- | --- | --- |
+| --- | :---: | :---: |
 | [auctioneer](https://github.com/curseforge-mirror/auctioneer) | ![workflow badge](https://github.com/curseforge-mirror/auctioneer/actions/workflows/main.yml/badge.svg) | ![workflow badge](https://github.com/curseforge-mirror/auctioneer/actions/workflows/template-sync.yml/badge.svg) |
 | [azeroth-auto-pilot](https://github.com/curseforge-mirror/azeroth-auto-pilot) | ![workflow badge](https://github.com/curseforge-mirror/azeroth-auto-pilot/actions/workflows/main.yml/badge.svg) | ![workflow badge](https://github.com/curseforge-mirror/azeroth-auto-pilot/actions/workflows/template-sync.yml/badge.svg) |
 | [bagnon](https://github.com/curseforge-mirror/bagnon) | ![workflow badge](https://github.com/curseforge-mirror/bagnon/actions/workflows/main.yml/badge.svg) | ![workflow badge](https://github.com/curseforge-mirror/bagnon/actions/workflows/template-sync.yml/badge.svg) |
