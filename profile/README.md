@@ -1,4 +1,4 @@
-# Curseforge Mirror
+## About
 
 ### 🙋‍♀️ Hey there!
 
@@ -7,10 +7,12 @@ This allows users who aren't using the CurseForge Addon Manager a chance to have
 
 While our name implies that we mirror from Curseforge, we do also happen to fork projects that are living on GitHub and apply our homegrown build pipeline to it so poorly configured repos can have a second life! 
 
+## Addons
+
 ### →[📝 Current Addon List](https://github.com/curseforge-mirror/.github/blob/main/README.md)
 ### →[📢 Request New Addons Here](https://github.com/curseforge-mirror/.github/issues/new?assignees=srhinos&labels=&template=addon-request.md&title=[REQ]%20New%20Addon%20Request)
 
----
+## Misc
 
 We also host updated / customized versions of a few repos that make up the tech stack of our on going mirroring such as:
 
