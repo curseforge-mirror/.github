@@ -7,6 +7,8 @@ This allows users who aren't using the CurseForge Addon Manager a chance to have
 
 While our name implies that we mirror from Curseforge, we do also happen to fork projects that are living on GitHub and apply our homegrown build pipeline to it so poorly configured repos can have a second life! 
 
+If you're an addon author and have an All Rights Reserved addon mirrored here, feel free to [file a ticket here](https://github.com/curseforge-mirror/.github/issues/new?assignees=srhinos&labels=&title=[REQ] ARR Addon Removal Request) and I'll ensure the mirrored code is taken down ASAP!
+
 ## Addons
 
 ### →[📝 Current Addon List](https://github.com/curseforge-mirror/.github/blob/main/README.md)
