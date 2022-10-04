@@ -2,7 +2,7 @@
 name: Addon Request
 about: Suggest a new addon to mirror + track!
 title: "[REQ]"
-labels: ''
+labels: 'Addon Request'
 assignees: srhinos
 
 ---
