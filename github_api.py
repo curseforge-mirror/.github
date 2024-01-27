@@ -108,7 +108,6 @@ async def update_readme(org_name, repo_name, content, sha, new_content):
         logger.error(f"Error updating README: {e}")
 
 
-@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
 async def create_release(org_name, repo_name, body):
     url = f"https://api.github.com/repos/{org_name}/{repo_name}/releases"
     releases = await api_request(url)
@@ -131,7 +130,7 @@ async def create_release(org_name, repo_name, body):
         "file_field_name": (
             "addon_list.md",
             open("addon_list.md", "rb"),
-            "content-type",
+            "text/markdown",
         )
     }
     await api_request(upload_url, method="POST", files=files)
