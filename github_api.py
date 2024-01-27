@@ -1,8 +1,8 @@
 import httpx
-from utils import async_retry
+from tenacity import retry, stop_after_attempt, wait_fixed
 
 
-@async_retry
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
 async def api_request(url, method="GET", data=None, headers=None):
     async with httpx.AsyncClient() as client:
         response = await client.request(method, url, json=data, headers=headers)
@@ -10,6 +10,7 @@ async def api_request(url, method="GET", data=None, headers=None):
         return response.json()
 
 
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
 async def get_repos(org_name):
     url = f"https://api.github.com/orgs/{org_name}/repos"
     repos = await api_request(url)
