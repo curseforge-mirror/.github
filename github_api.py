@@ -61,7 +61,7 @@ async def get_readme_content(org_name, repo_name):
         return await api_request(url)
     except Exception as e:
         logger.error(f"Error fetching README content: {e}")
-        return None, None
+        return None
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
@@ -76,12 +76,14 @@ async def update_readme(org_name, repo_name, content, sha, new_content):
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
-async def create_release(org_name, repo_name, tag_name, release_name, body):
+async def create_release(org_name, repo_name, release_name, body):
     url = f"https://api.github.com/repos/{org_name}/{repo_name}/releases"
+    releases = api_request(url)
+    latest_version = len(releases) + 1
     try:
         logger.info(f"Creating release {release_name} for {repo_name}")
         data = {
-            "tag_name": tag_name,
+            "tag_name": latest_version,
             "name": release_name,
             "body": body,
             "draft": False,

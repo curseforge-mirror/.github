@@ -35,8 +35,10 @@ async def main():
 
     new_addon_list = "\n".join(markdown_content)
 
-    readme_content, readme_sha = await get_readme_content(org_name, repo_name)
-    await update_readme(readme_content, readme_sha, new_addon_list, org_name, repo_name)
+    readme = await get_readme_content(org_name, repo_name)
+    await update_readme(
+        org_name, repo_name, readme["content"], readme["sha"], new_addon_list
+    )
 
     current_date = datetime.now().strftime("%m/%d/%y")
     release_note = f"Addon list updated on {current_date}"
