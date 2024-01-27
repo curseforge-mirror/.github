@@ -34,6 +34,8 @@ async def get_repos(org_name):
         for repo in repos:
             if repo and not repo.get("private") and not repo.get("archived"):
                 repo["languages"] = await get_languages(repo["languages_url"])
+                if not repo["languages"]:
+                    continue
                 valid_repos.append(repo)
         return valid_repos
     except Exception as e:
