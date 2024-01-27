@@ -1,14 +1,21 @@
+import os
 import httpx
 from tenacity import retry, stop_after_attempt, wait_fixed
 import logging
 
 logger = logging.getLogger(__name__)
 
+github_token = os.environ["GITHUB_TOKEN"]
+
 
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
 async def api_request(url, method="GET", data=None, headers=None):
     try:
-        async with httpx.AsyncClient() as client:
+        headers = {
+            "Authorization": f"Bearer {github_token}",
+            "Accept": "application/vnd.github.v3+json",
+        }
+        async with httpx.AsyncClient(headers=headers) as client:
             logger.debug(f"Requesting URL: {url} with method: {method}")
             response = await client.request(method, url, json=data, headers=headers)
             response.raise_for_status()
