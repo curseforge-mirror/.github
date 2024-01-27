@@ -27,12 +27,28 @@ async def api_request(
             logger.debug(f"Requesting URL: {url} with method: {method}")
             if is_binary:
                 response = await client.request(
-                    method, url, content=data, headers=default_headers
+                    method,
+                    url,
+                    content=data,
+                    headers=default_headers,
+                    follow_redirects=True,
                 )
             else:
                 response = await client.request(
-                    method, url, json=data, headers=default_headers, files=files
+                    method,
+                    url,
+                    json=data,
+                    headers=default_headers,
+                    files=files,
+                    follow_redirects=True,
                 )
+            if response.is_redirect:
+                new_url = response.headers.get("Location")
+                if new_url:
+                    logger.debug(f"Following redirect to URL: {new_url}")
+                    return await api_request(new_url, method, data, headers, files)
+                else:
+                    raise Exception("Redirected, but no Location header found.")
             response.raise_for_status()
             try:
                 return response.json()
