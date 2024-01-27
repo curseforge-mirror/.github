@@ -137,7 +137,7 @@ async def create_release(org_name, repo_name, body):
     url = f"https://api.github.com/repos/{org_name}/{repo_name}/releases"
     releases = await api_request(url)
 
-    old_addon_list = await get_latest_addon_list()
+    old_addon_list = await get_latest_addon_list(org_name, repo_name)
     changes = "\n".join(
         difflib.unified_diff(
             old_addon_list.splitlines(),
