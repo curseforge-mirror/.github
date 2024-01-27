@@ -11,18 +11,27 @@ logger = logging.getLogger(__name__)
 github_token = os.environ["GITHUB_TOKEN"]
 
 
-@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
-async def api_request(url, method="GET", data=None, headers=None, files=None):
+async def api_request(
+    url, method="GET", data=None, headers=None, files=None, is_binary=False
+):
     try:
-        headers = {
+        default_headers = {
             "Authorization": f"Bearer {github_token}",
             "Accept": "application/vnd.github.v3+json",
         }
-        async with httpx.AsyncClient(headers=headers) as client:
+        if headers:
+            default_headers.update(headers)
+
+        async with httpx.AsyncClient() as client:
             logger.debug(f"Requesting URL: {url} with method: {method}")
-            response = await client.request(
-                method, url, json=data, headers=headers, files=files
-            )
+            if is_binary:
+                response = await client.request(
+                    method, url, content=data, headers=default_headers
+                )
+            else:
+                response = await client.request(
+                    method, url, json=data, headers=default_headers, files=files
+                )
             response.raise_for_status()
             return response.json()
     except httpx.HTTPStatusError as e:
@@ -125,12 +134,19 @@ async def create_release(org_name, repo_name, body):
         "prerelease": False,
     }
     release_response = await api_request(url, method="POST", data=release_data)
-    upload_url = release_response["upload_url"].replace("{?name,label}", "")
-    files = {
-        "file_field_name": (
-            "addon_list.md",
-            open("addon_list.md", "rb"),
-            "text/markdown",
-        )
-    }
-    await api_request(upload_url, method="POST", files=files)
+    upload_url = release_response["upload_url"].replace(
+        "{?name,label}", "?name=addon_list.md"
+    )
+    with open("addon_list.md", "rb") as f:
+        file_content = f.read()
+
+    await api_request(
+        upload_url,
+        method="POST",
+        data=file_content,
+        headers={
+            "Content-Type": "application/octet-stream",
+            "X-GitHub-Api-Version": "2022-11-28",
+        },
+        is_binary=True,
+    )
