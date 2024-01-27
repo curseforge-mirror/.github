@@ -1,52 +1,90 @@
 import httpx
 from tenacity import retry, stop_after_attempt, wait_fixed
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
 async def api_request(url, method="GET", data=None, headers=None):
-    async with httpx.AsyncClient() as client:
-        response = await client.request(method, url, json=data, headers=headers)
-        response.raise_for_status()
-        return response.json()
+    try:
+        async with httpx.AsyncClient() as client:
+            logger.debug(f"Requesting URL: {url} with method: {method}")
+            response = await client.request(method, url, json=data, headers=headers)
+            response.raise_for_status()
+            return response.json()
+    except httpx.HTTPStatusError as e:
+        if e.response.status_code == 451:
+            logger.warning(f"Repository unavailable due to legal reasons: {url}")
+            return None
+        logger.error(f"HTTP error occurred: {e}")
+        raise
+    except Exception as e:
+        logger.error(f"An error occurred: {e}")
+        raise
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
 async def get_repos(org_name):
     url = f"https://api.github.com/orgs/{org_name}/repos"
-    repos = await api_request(url)
-    for repo in repos:
-        repo["languages"] = await get_languages(repo["languages_url"])
-    return repos
+    try:
+        logger.info("Fetching repositories from GitHub.")
+        repos = await api_request(url)
+        valid_repos = []
+        for repo in repos:
+            if repo and not repo.get("private") and not repo.get("archived"):
+                repo["languages"] = await get_languages(repo["languages_url"])
+                valid_repos.append(repo)
+        return valid_repos
+    except Exception as e:
+        logger.error(f"Error fetching repositories: {e}")
+        return []
 
 
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
 async def get_languages(languages_url):
-    return await api_request(languages_url)
+    try:
+        logger.debug(f"Fetching languages from {languages_url}")
+        return await api_request(languages_url)
+    except Exception as e:
+        logger.error(f"Error fetching languages: {e}")
+        return {}
 
 
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
 async def get_readme_content(org_name, repo_name):
     url = f"https://api.github.com/repos/{org_name}/{repo_name}/contents/README.md"
-    readme_data = await api_request(url)
-    return readme_data["content"], readme_data["sha"]
+    try:
+        logger.info(f"Fetching README content for {repo_name}")
+        return await api_request(url)
+    except Exception as e:
+        logger.error(f"Error fetching README content: {e}")
+        return None, None
 
 
-async def update_readme(content, sha, new_addon_list, org_name, repo_name):
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
+async def update_readme(org_name, repo_name, content, sha, new_content):
     url = f"https://api.github.com/repos/{org_name}/{repo_name}/contents/README.md"
-    updated_content = (
-        content.split("| --- | :---: | :---: | :---: |")[0]
-        + "| --- | :---: | :---: | :---: |\n"
-        + new_addon_list
-    )
-    data = {"message": "Update README", "content": updated_content, "sha": sha}
-    await api_request(url, method="PUT", data=data)
+    try:
+        logger.info(f"Updating README for {repo_name}")
+        data = {"message": "Update README.md", "content": new_content, "sha": sha}
+        await api_request(url, method="PUT", data=data)
+    except Exception as e:
+        logger.error(f"Error updating README: {e}")
 
 
-async def create_release(org_name, repo_name, release_note, new_addon_list):
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
+async def create_release(org_name, repo_name, tag_name, release_name, body):
     url = f"https://api.github.com/repos/{org_name}/{repo_name}/releases"
-    release_data = {
-        "tag_name": "new_release",
-        "name": "New Addon List Release",
-        "body": release_note,
-        "draft": False,
-        "prerelease": False,
-    }
-    await api_request(url, method="POST", data=release_data)
+    try:
+        logger.info(f"Creating release {release_name} for {repo_name}")
+        data = {
+            "tag_name": tag_name,
+            "name": release_name,
+            "body": body,
+            "draft": False,
+            "prerelease": False,
+        }
+        await api_request(url, method="POST", data=data)
+    except Exception as e:
+        logger.error(f"Error creating release: {e}")

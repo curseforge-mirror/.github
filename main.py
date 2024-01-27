@@ -1,7 +1,11 @@
 import asyncio
 from datetime import datetime
 from github_api import get_repos, get_readme_content, update_readme, create_release
+from logger_config import setup_logging
+import logging
 
+setup_logging()
+logger = logging.getLogger(__name__)
 org_name = "curseforge-mirror"
 repo_name = ".github"
 ignore_misc = ["template", ".github", "actions-template-sync", "cloudscraper"]
@@ -11,10 +15,12 @@ small_out_str = "| [{0}](https://github.com/curseforge-mirror/{0}) | [![workflow
 
 
 async def main():
+    logger.info("Script started.")
     markdown_content = []
     repos = await get_repos(org_name)
 
     for repo in repos:
+        logger.info(f'Processing repository: {repo["name"]}')
         if (
             repo["name"] not in ignore_misc
             and not repo["private"]
