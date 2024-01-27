@@ -35,6 +35,9 @@ async def main():
 
     new_addon_list = "\n".join(markdown_content)
 
+    with open("addon_list.md", "w") as file:
+        file.write(new_addon_list)
+
     readme_content, readme_sha = await get_readme_content(org_name, repo_name)
     await update_readme(org_name, repo_name, readme_content, readme_sha, new_addon_list)
     await create_release(org_name, repo_name, new_addon_list)

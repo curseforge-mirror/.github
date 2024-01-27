@@ -1,5 +1,5 @@
 import os
-
+import re
 import httpx
 import base64
 from tenacity import retry, stop_after_attempt, wait_fixed
@@ -93,8 +93,10 @@ async def update_readme(org_name, repo_name, content, sha, new_content):
             + "| --- | :---: | :---: | :---: |\n"
             + new_content
         )
-        updated_readme = updated_readme.replace(
-            "Current Addon List", f"Current Addon List ({new_date})"
+        updated_readme = re.sub(
+            r"Current Addon List \([^)]+\)",
+            f"Current Addon List ({new_date})",
+            updated_readme,
         )
         commit_data = {
             "message": f"Update README with new addon list on {new_date}",
