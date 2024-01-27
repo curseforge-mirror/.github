@@ -2,6 +2,7 @@ import os
 import re
 import httpx
 import base64
+import difflib
 from tenacity import retry, stop_after_attempt, wait_fixed
 from datetime import datetime
 import logging
@@ -33,7 +34,10 @@ async def api_request(
                     method, url, json=data, headers=default_headers, files=files
                 )
             response.raise_for_status()
-            return response.json()
+            try:
+                return response.json()
+            except ValueError:
+                return response.text
     except httpx.HTTPStatusError as e:
         if e.response.status_code == 451:
             logger.warning(f"Repository unavailable due to legal reasons: {url}")
@@ -117,9 +121,36 @@ async def update_readme(org_name, repo_name, content, sha, new_content):
         logger.error(f"Error updating README: {e}")
 
 
+async def get_latest_addon_list(org_name, repo_name):
+    releases = await api_request(
+        f"https://api.github.com/repos/{org_name}/{repo_name}/releases"
+    )
+    if releases:
+        latest_release = releases[0]
+        for asset in latest_release["assets"]:
+            if asset["name"] == "addon_list.md":
+                return await api_request(asset["browser_download_url"])
+    return ""
+
+
 async def create_release(org_name, repo_name, body):
     url = f"https://api.github.com/repos/{org_name}/{repo_name}/releases"
     releases = await api_request(url)
+
+    old_addon_list = await get_latest_addon_list()
+    changes = "\n".join(
+        difflib.unified_diff(
+            old_addon_list.splitlines(),
+            body.splitlines(),
+            fromfile="old_list",
+            tofile="new_list",
+            lineterm="",
+        )
+    )
+    if not changes and releases:
+        logger.info("No changes detected, skipping release creation.")
+        return
+
     latest_version = len(releases) + 1
     release_note = (
         f"Automatically generated addon list\n\n### Changes:\n{body}"
