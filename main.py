@@ -35,14 +35,9 @@ async def main():
 
     new_addon_list = "\n".join(markdown_content)
 
-    readme = await get_readme_content(org_name, repo_name)
-    await update_readme(
-        org_name, repo_name, readme["content"], readme["sha"], new_addon_list
-    )
-
-    current_date = datetime.now().strftime("%m/%d/%y")
-    release_note = f"Addon list updated on {current_date}"
-    await create_release(org_name, repo_name, release_note, new_addon_list)
+    readme_content, readme_sha = await get_readme_content(org_name, repo_name)
+    await update_readme(org_name, repo_name, readme_content, readme_sha, new_addon_list)
+    await create_release(org_name, repo_name, new_addon_list)
 
 
 if __name__ == "__main__":
