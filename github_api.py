@@ -155,14 +155,20 @@ async def create_release(org_name, repo_name, body):
 
     old_addon_list = await get_latest_addon_list(org_name, repo_name)
     changes = "\n".join(
-        difflib.unified_diff(
-            old_addon_list.splitlines(),
-            body.splitlines(),
-            fromfile="old_list",
-            tofile="new_list",
-            lineterm="",
-        )
+        list(
+            difflib.unified_diff(
+                old_addon_list.splitlines(),
+                body.splitlines(),
+                fromfile="old_list",
+                tofile="new_list",
+                lineterm="",
+                n=0,
+            )
+        )[
+            3:
+        ]  # ugly but I dont want the first 3 lines.
     )
+
     if not changes and releases:
         logger.info("No changes detected, skipping release creation.")
         return
