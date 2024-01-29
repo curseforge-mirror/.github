@@ -169,7 +169,7 @@ async def create_release(org_name, repo_name, body):
 
     latest_version = len(releases) + 1
     release_note = (
-        f"Automatically generated addon list\n\n### Changes:\n{body}"
+        f"Automatically generated addon list\n\n### Changes:\n{changes}"
         if releases
         else "Creating first release"
     )
