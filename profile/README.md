@@ -5,9 +5,11 @@
 This org mirrors popular (and unpopular) addons that currently only have a home on CurseForge, either intentionally or unintentionally. 
 This allows users who aren't using the CurseForge Addon Manager a chance to have their addons automatically updated and, well.... managed!
 
-While our name implies that we mirror from Curseforge, we do also happen to fork projects that are living on GitHub and apply our homegrown build pipeline to it so poorly configured repos can have a second life! 
+While our name implies that we mirror from Curseforge, we do also happen to fork projects that are living on GitHub and apply a build pipeline to it so poorly configured repos can have a second life! 
 
 If you're an addon author and have an All Rights Reserved addon that was mistakenly mirrored here, feel free to [file a ticket here](https://github.com/curseforge-mirror/.github/issues/new?assignees=srhinos&labels=Removal%20Request&title=[REQ]%20Addon%20Removal%20Request) and the mirrored code will be removed ASAP!
+
+IF you're looking for a way to get in contact with the folks running this little project, feel free to file an issue [here](https://github.com/curseforge-mirror/.github/issues) or [join our discord](https://discord.gg/rhino)! Happy to discuss any bigger ideas / features with anyone!
 
 ## Addons
 
